@@ -51,5 +51,17 @@ func main() {
 		log.Fatalf("failed to get response: %v", err)
 	}
 	log.Printf("Created: %t", response.Created)
-	log.Printf("Consignment Description: %s", response.Consignment.Description)
+	response2, err2 := client.CreateConsignment(context.Background(), consignment)
+	if err2 != nil {
+		log.Fatalf("failed to get response: %v", err2)
+	}
+	log.Printf("Created: %t", response2.Created)
+
+	response3, err3 := client.GetConsignment(context.Background(), &pb.GetRequest{})
+	if err3 != nil {
+		log.Fatalf("failed to get consignments: %v", err)
+	}
+	for i, v := range response3.Consignments {
+		log.Println(i, "consignment's description is", v.Description)
+	}
 }

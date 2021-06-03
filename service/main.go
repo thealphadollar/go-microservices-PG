@@ -17,6 +17,7 @@ const (
 
 type repository interface {
 	Create(*pb.Consignment) (*pb.Consignment, error)
+	GetAll() ([]*pb.Consignment, error)
 }
 
 // a dummy repository to simulate warehouse
@@ -33,6 +34,10 @@ func (repo *Repository) Create(consignment *pb.Consignment) (*pb.Consignment, er
 	return consignment, nil
 }
 
+func (repo *Repository) GetAll() ([]*pb.Consignment, error) {
+	return repo.consignments, nil
+}
+
 type service struct {
 	repo repository
 }
@@ -43,6 +48,14 @@ func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*
 		return nil, err
 	}
 	return &pb.Response{Created: true, Consignment: consignment}, nil
+}
+
+func (s *service) GetConsignment(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
+	consignments, err := s.repo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Response{Consignments: consignments, TotalConsignments: int32(len(consignments))}, nil
 }
 
 func main() {
