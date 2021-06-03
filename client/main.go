@@ -61,6 +61,7 @@ func main() {
 	if err3 != nil {
 		log.Fatalf("failed to get consignments: %v", err)
 	}
+	log.Println("Total consignments received: ", response3.TotalConsignments)
 	for i, v := range response3.Consignments {
 		log.Println(i, "consignment's description is", v.Description)
 	}
