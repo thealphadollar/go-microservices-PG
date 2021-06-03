@@ -13,7 +13,7 @@ import (
 
 const (
 	address         = "localhost:50051"
-	defaultFilename = "consignment.json"
+	defaultFilename = "client/consignment.json"
 )
 
 func parseFile(file string) (*pb.Consignment, error) {
@@ -28,7 +28,7 @@ func parseFile(file string) (*pb.Consignment, error) {
 }
 
 func main() {
-	conn, err := grpc.Dial(address, grpc.WithInsecure)
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	defer conn.Close()
 	if err != nil {
 		log.Fatalf("failed to dial: %v", err)
@@ -51,4 +51,5 @@ func main() {
 		log.Fatalf("failed to get response: %v", err)
 	}
 	log.Printf("Created: %t", response.Created)
+	log.Printf("Consignment Description: %s", response.Consignment.Description)
 }
