@@ -1,4 +1,4 @@
-module github.com/thealphadollar/go-microservices-PG
+module github.com/thealphadollar/go-microservices-PG/service
 
 go 1.16
 
