@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"os"
 
 	pb "github.com/thealphadollar/go-microservices-PG/service/proto/consignment"
 	"google.golang.org/grpc"
@@ -31,6 +33,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to dial: %v", err)
 	}
-	client = pb.NewShippingServiceClient(conn)
-	
+	client := pb.NewShippingServiceClient(conn)
+
+	file := defaultFilename
+	if len(os.Args) > 1 {
+		file = os.Args[1]
+	}
+
+	consignment, err := parseFile(file)
+
+	if err != nil {
+		log.Fatalf("failed to parse file: %v", err)
+	}
+
+	response, err := client.CreateConsignment(context.Background(), consignment)
+	if err != nil {
+		log.Fatalf("failed to get response: %v", err)
+	}
+	log.Printf("Created: %t", response.Created)
 }
