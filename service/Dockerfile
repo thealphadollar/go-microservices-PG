@@ -21,6 +21,8 @@ FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
+ENV MICRO_SERVER_ADDRESS=:50051
+
 RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /app/consignment-service .
