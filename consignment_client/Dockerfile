@@ -21,9 +21,8 @@ FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-RUN mkdir /app
-RUN mkdir /app/client/
-COPY ./client/consignment.json ./app/client/
+RUN mkdir -p /app/consignment_client/
+COPY ./consignment_client/consignment.json ./app/consignment_client/
 WORKDIR /app
 COPY --from=builder /app/consignment-client .
 

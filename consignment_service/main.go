@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	micro "github.com/micro/go-micro/v2"
-	pb "github.com/thealphadollar/go-microservices-PG/service/proto/consignment"
+	pb "github.com/thealphadollar/go-microservices-PG/consignment_service/proto/consignment"
 )
 
 const (

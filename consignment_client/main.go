@@ -8,12 +8,11 @@ import (
 	"os"
 
 	micro "github.com/micro/go-micro/v2"
-	pb "github.com/thealphadollar/go-microservices-PG/service/proto/consignment"
+	pb "github.com/thealphadollar/go-microservices-PG/consignment_service/proto/consignment"
 )
 
 const (
-	address         = "localhost:50051"
-	defaultFilename = "client/consignment.json"
+	defaultFilename = "consignment_client/consignment.json"
 )
 
 func parseFile(file string) (*pb.Consignment, error) {
