@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/micro/go-micro/v2 v2.9.1-0.20200723075038-fbdf1f2c1c4c
-	github.com/stretchr/testify v1.5.1 // indirect
+	go.mongodb.org/mongo-driver v1.5.3 // indirect
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect

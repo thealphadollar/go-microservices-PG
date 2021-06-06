@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"sync"
+	"os"
 
 	micro "github.com/micro/go-micro/v2"
 	pb "github.com/thealphadollar/go-microservices-PG/consignment_service/proto/consignment"
@@ -11,84 +11,44 @@ import (
 )
 
 const (
-	port = ":50051"
+	defaultHost = "datastore:27017"
 )
 
-type repository interface {
-	Create(*pb.Consignment) (*pb.Consignment, error)
-	GetAll() ([]*pb.Consignment, error)
-}
-
-// a dummy repository to simulate warehouse
-type Repository struct {
-	mu           sync.RWMutex
-	consignments []*pb.Consignment
-}
-
-func (repo *Repository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {
-	repo.mu.Lock()
-	defer repo.mu.Unlock()
-	updated := append(repo.consignments, consignment)
-	repo.consignments = updated
-	return consignment, nil
-}
-
-func (repo *Repository) GetAll() ([]*pb.Consignment, error) {
-	return repo.consignments, nil
-}
-
-type service struct {
-	repo           repository
-	vessel_service vessel_pb.VesselService
-}
-
-func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
-	vessel, err := s.vessel_service.FindAvailable(context.Background(), &vessel_pb.Specification{
-		MaxWeight: req.Weight,
-		Capacity:  int32(len(req.Containers)),
-	})
-
-	if err != nil {
-		return err
-	}
-
-	req.VesselId = vessel.Vessel.Id
-
-	consignment, err := s.repo.Create(req)
-	if err != nil {
-		return err
-	}
-	res.Consignment = consignment
-	res.Created = true
-	return nil
-}
-
-func (s *service) GetConsignment(ctx context.Context, req *pb.GetRequest, res *pb.Response) error {
-	consignments, err := s.repo.GetAll()
-	if err != nil {
-		return err
-	}
-	res.Consignments = consignments
-	res.TotalConsignments = int32(len(consignments))
-	return nil
-}
-
 func main() {
-	repo := &Repository{}
-
 	s := micro.NewService(
 		micro.Name("consignment.service"),
 	)
 	s.Init()
-	vessel_service := vessel_pb.NewVesselService("vessel.service", s.Client())
 
-	// tie with grpc generated server
-	if err := pb.RegisterShippingServiceHandler(s.Server(), &service{repo, vessel_service}); err != nil {
-		log.Fatalf("failed to register service handler: %v", err)
+	uri := os.Getenv("DB_HOST")
+	if uri == "" {
+		uri = defaultHost
 	}
 
-	log.Println("Running on port: ", port)
+	client, err := CreateClient(context.Background(), uri, 3)
+	if err != nil {
+		log.Fatalf("failed to connect to db: %v", err)
+	}
+	defer client.Disconnect(context.Background())
+
+	consignmentCollection := client.Database("shippy").Collection("consigments")
+	repository := &MongoRepository{consignment_collection: consignmentCollection}
+	vesselClient := vessel_pb.NewVesselService("vessel.service", s.Client())
+
+	// add dummy vessels
+	resp, err := vesselClient.CreateVessel(context.Background(), &vessel_pb.Vessel{
+		Id: "001", Name: "Boaty Vessel 1", Capacity: 500, MaxWeight: 200000, Available: true,
+	})
+	if err != nil {
+		log.Panicf("failed to create dummy vessel: %v", err)
+	} else {
+		log.Println("vessel creation: ", resp.Created)
+	}
+
+	h := &handler{repository, vesselClient}
+
+	pb.RegisterShippingServiceHandler(s.Server(), h)
 	if err := s.Run(); err != nil {
-		log.Fatalf("failed to server: %v", err)
+		log.Fatalf("failed to run service: %v", err)
 	}
 }
