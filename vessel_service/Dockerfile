@@ -14,17 +14,17 @@ COPY . .
 RUN go mod tidy
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a \
-    -installsuffix cgo -o consignment-service ./consignment_service
+    -installsuffix cgo -o vessel-service ./vessel_service
 
 # Run Service
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-ENV MICRO_SERVER_ADDRESS=:50051
+ENV MICRO_SERVER_ADDRESS=:50050
 
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /app/consignment-service .
+COPY --from=builder /app/vessel-service .
 
-CMD ["./consignment-service"]
+CMD ["./vessel-service"]

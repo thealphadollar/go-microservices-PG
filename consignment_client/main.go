@@ -61,5 +61,6 @@ func main() {
 	log.Println("Total consignments received: ", response3.TotalConsignments)
 	for i, v := range response3.Consignments {
 		log.Println(i, "consignment's description is", v.Description)
+		log.Println(i, "consignment's vesselId is", v.VesselId)
 	}
 }

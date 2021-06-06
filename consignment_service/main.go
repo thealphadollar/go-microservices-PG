@@ -7,6 +7,7 @@ import (
 
 	micro "github.com/micro/go-micro/v2"
 	pb "github.com/thealphadollar/go-microservices-PG/consignment_service/proto/consignment"
+	vessel_pb "github.com/thealphadollar/go-microservices-PG/vessel_service/proto/vessel"
 )
 
 const (
@@ -37,10 +38,22 @@ func (repo *Repository) GetAll() ([]*pb.Consignment, error) {
 }
 
 type service struct {
-	repo repository
+	repo           repository
+	vessel_service vessel_pb.VesselService
 }
 
 func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
+	vessel, err := s.vessel_service.FindAvailable(context.Background(), &vessel_pb.Specification{
+		MaxWeight: req.Weight,
+		Capacity:  int32(len(req.Containers)),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	req.VesselId = vessel.Vessel.Id
+
 	consignment, err := s.repo.Create(req)
 	if err != nil {
 		return err
@@ -67,9 +80,10 @@ func main() {
 		micro.Name("consignment.service"),
 	)
 	s.Init()
+	vessel_service := vessel_pb.NewVesselService("vessel.service", s.Client())
 
 	// tie with grpc generated server
-	if err := pb.RegisterShippingServiceHandler(s.Server(), &service{repo}); err != nil {
+	if err := pb.RegisterShippingServiceHandler(s.Server(), &service{repo, vessel_service}); err != nil {
 		log.Fatalf("failed to register service handler: %v", err)
 	}
 

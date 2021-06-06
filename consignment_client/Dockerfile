@@ -14,7 +14,7 @@ COPY . .
 RUN go mod tidy
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a \
-    -installsuffix cgo -o consignment-client ./client
+    -installsuffix cgo -o consignment-client ./consignment_client
 
 # Run Service
 FROM alpine:latest
