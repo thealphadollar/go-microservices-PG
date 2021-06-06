@@ -1,0 +1,47 @@
+version: '3.5'
+
+services:
+
+    consignment:
+        restart: always
+        build: 
+            context: .
+            dockerfile: ./consignment_service/Dockerfile
+        depends_on: 
+            - vessel
+            - datastore
+        ports:
+            - 50051:50051
+        environment: 
+            MICRO_SERVER_ADDRESS: ":50051"
+            DB_HOST: "mongodb://datastore:27017"
+
+    vessel:
+        restart: always
+        build:
+            context: .
+            dockerfile: ./vessel_service/Dockerfile
+        ports:
+            - 50052:50051
+        environment: 
+            MICRO_SERVER_ADDRESS: ":50051"
+            DB_HOST: "mongodb://datastore:27017"
+    
+    client:
+        build:
+            context: .
+            dockerfile: ./consignment_client/Dockerfile
+        depends_on: 
+            - consignment
+    
+    datastore:
+        image: mongo
+        container_name: "datastore"
+        environment: 
+            MONGO_DATA_DIR: "/data/db"
+            MONGO_LOG_DIR: "/dev/null"
+        volumes: 
+            - ./data/db:/data/db
+        ports: 
+            - 27017
+        command: mongod --logpath=/dev/null
