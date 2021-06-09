@@ -56,7 +56,7 @@ func main() {
 
 	response3, err3 := client.GetConsignment(context.Background(), &pb.GetRequest{})
 	if err3 != nil {
-		log.Fatalf("failed to get consignments: %v", err)
+		log.Fatalf("failed to get consignments: %v", err3)
 	}
 	log.Println("Total consignments received: ", response3.TotalConsignments)
 	for i, v := range response3.Consignments {

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	pb "github.com/thealphadollar/go-microservices-PG/consignment_service/proto/consignment"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,7 +21,7 @@ type Container struct {
 	ID         string `json:"id"`
 	CustomerID string `json:"customer_id"`
 	UserID     string `json:"user_id"`
-	Origin string `json:"origin"`
+	Origin     string `json:"origin"`
 }
 
 type Containers []*Container
@@ -59,39 +60,39 @@ func UnmarshalConsignmentCollection(consignments []*Consignment) []*pb.Consignme
 
 func MarshalContainer(container *pb.Container) *Container {
 	return &Container{
-		ID: container.Id,
+		ID:         container.Id,
 		CustomerID: container.CustomerId,
-		UserID: container.UserId,
-		Origin: container.Origin,
+		UserID:     container.UserId,
+		Origin:     container.Origin,
 	}
 }
 
 func UnmarshalContainer(container *Container) *pb.Container {
 	return &pb.Container{
-		Id: container.ID,
+		Id:         container.ID,
 		CustomerId: container.CustomerID,
-		UserId: container.UserID,
-		Origin: container.Origin,
+		UserId:     container.UserID,
+		Origin:     container.Origin,
 	}
 }
 
 func MarshalConsignment(consignment *pb.Consignment) *Consignment {
 	return &Consignment{
-		ID: consignment.Id,
-		Weight: consignment.Weight,
-		VesselID: consignment.VesselId,
-		Containers: MarshalContainerCollection(consignment.Containers),
+		ID:          consignment.Id,
+		Weight:      consignment.Weight,
+		VesselID:    consignment.VesselId,
+		Containers:  MarshalContainerCollection(consignment.Containers),
 		Description: consignment.Description,
 	}
 }
 
-func UnmarshalConsignment (consignment *Consignment) *pb.Consignment {
+func UnmarshalConsignment(consignment *Consignment) *pb.Consignment {
 	return &pb.Consignment{
-		Id: consignment.ID,
+		Id:          consignment.ID,
 		Description: consignment.Description,
-		VesselId: consignment.VesselID,
-		Weight: consignment.Weight,
-		Containers: UnmarshalContainerCollection(consignment.Containers),
+		VesselId:    consignment.VesselID,
+		Weight:      consignment.Weight,
+		Containers:  UnmarshalContainerCollection(consignment.Containers),
 	}
 }
 
@@ -104,13 +105,13 @@ type MongoRepository struct {
 	consignment_collection *mongo.Collection
 }
 
-func (repo *MongoRepository) Create (ctx context.Context, consignment *Consignment) error {
+func (repo *MongoRepository) Create(ctx context.Context, consignment *Consignment) error {
 	_, err := repo.consignment_collection.InsertOne(ctx, consignment)
 	return err
 }
 
 func (repo *MongoRepository) GetAll(ctx context.Context) ([]*Consignment, error) {
-	cur, err := repo.consignment_collection.Find(ctx, nil, nil)
+	cur, err := repo.consignment_collection.Find(ctx, bson.D{}, nil)
 	if err != nil {
 		log.Panicf("failed to find in repo collection: %v", err)
 	}

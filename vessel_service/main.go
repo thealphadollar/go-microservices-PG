@@ -24,7 +24,7 @@ func main() {
 	if uri == "" {
 		uri = defaultHost
 	}
-	client, err := CreateClient(context.Background(), uri, 3)
+	client, err := CreateClient(context.TODO(), uri, 3)
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
