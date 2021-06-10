@@ -45,3 +45,35 @@ services:
         ports: 
             - 27017
         command: mongod --logpath=/dev/null
+
+    user:
+        restart: always
+        build:
+            context: .
+            dockerfile: ./user_service/Dockerfile            
+        ports: 
+            - 50053:50051
+        environment: 
+            MICRO_ADDRESS: ":50051"
+            SECRET_KEY: "somesecretkey"
+            DB_HOST: "database"
+            DB_USER: "admin"
+            DB_PASSWORD: "password"
+            DB_NAME: "postgres"
+        depends_on: 
+            - database
+
+    usercli:
+        build: 
+            context: .
+            dockerfile: ./user_client/Dockerfile
+        depends_on: 
+            - user
+
+    database:
+        image: postgres:alpine
+        environment: 
+            POSTGRES_PASSWORD: "password"
+            POSTGRES_USER: "admin"
+        ports:
+            - 5432:5432
