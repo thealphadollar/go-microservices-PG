@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 
-	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/util/log"
 	pb "github.com/thealphadollar/go-microservices-PG/user_service/proto/user"
 	"golang.org/x/crypto/bcrypt"
@@ -21,7 +20,7 @@ type authable interface {
 type handler struct {
 	repo         Repository
 	tokenService authable
-	PubSub       broker.Broker
+	PubSub       micro.Publisher
 }
 
 func (h *handler) Create(ctx context.Context, user *pb.User, res *pb.Response) error {
@@ -37,10 +36,9 @@ func (h *handler) Create(ctx context.Context, user *pb.User, res *pb.Response) e
 	res.User = user
 	res.Errors = nil
 
-	if err := h.publishEvent(user); err != nil {
+	if err := h.PubSub.Publish(ctx, user); err != nil {
 		log.Warnf("failed to publish event: %v", err)
 	}
-
 	return nil
 }
 
@@ -88,25 +86,5 @@ func (h *handler) ValidateToken(ctx context.Context, token *pb.Token, res *pb.To
 	}
 	res.Token = token.Token
 	res.Valid = true
-	return nil
-}
-
-func (h *handler) publishEvent(user *pb.User) error {
-	body, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
-
-	msg := &broker.Message{
-		Header: map[string]string{
-			"id": user.Id,
-		},
-		Body: body,
-	}
-
-	if err := h.PubSub.Publish(topic, msg); err != nil {
-		return err
-	}
-
 	return nil
 }

@@ -11,7 +11,7 @@ import (
 
 const (
 	name     = "Shivam"
-	email    = "s-kumar2@mercari.com"
+	email    = "s-kumar3@mercari.com"
 	password = "somepass"
 	company  = "Mercari"
 )
