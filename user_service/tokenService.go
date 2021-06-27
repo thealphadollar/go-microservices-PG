@@ -21,9 +21,13 @@ type TokenService struct {
 }
 
 func (t *TokenService) Decode(token string) (*CustomClaims, error) {
-	tokenType, err := jwt.ParseWithClaims(string(key), &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	tokenType, err := jwt.ParseWithClaims(token, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	if claims, ok := tokenType.Claims.(*CustomClaims); ok && tokenType.Valid {
 		return claims, nil
@@ -35,8 +39,8 @@ func (t *TokenService) Encode(user *pb.User) (string, error) {
 	claims := CustomClaims{
 		user,
 		jwt.StandardClaims{
-			ExpiresAt: 15000,
-			Issuer:    "user.service",
+			// ExpiresAt: 1500,
+			Issuer: "user.service",
 		},
 	}
 

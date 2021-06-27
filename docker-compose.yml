@@ -10,6 +10,7 @@ services:
         depends_on: 
             - vessel
             - datastore
+            - user
         ports:
             - 50051:50051
         environment: 
@@ -75,5 +76,3 @@ services:
         environment: 
             POSTGRES_PASSWORD: "password"
             POSTGRES_USER: "admin"
-        ports:
-            - 5432:5432

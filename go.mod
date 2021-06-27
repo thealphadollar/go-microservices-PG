@@ -10,7 +10,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/kr/pretty v0.2.0 // indirect
-	github.com/lib/pq v1.10.2 // indirect
+	github.com/lib/pq v1.10.2
 	github.com/micro/go-micro/v2 v2.9.1-0.20200723075038-fbdf1f2c1c4c
 	github.com/satori/go.uuid v1.2.0
 	go.mongodb.org/mongo-driver v1.5.3

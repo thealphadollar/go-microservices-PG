@@ -60,7 +60,7 @@ func (h *handler) Auth(ctx context.Context, user *pb.User, res *pb.Token) error 
 	if err := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password)); err != nil {
 		return err
 	}
-	token, err := h.tokenService.Encode(user)
+	token, err := h.tokenService.Encode(UnmarshalUser(result))
 	if err != nil {
 		return err
 	}

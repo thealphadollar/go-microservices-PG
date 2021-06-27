@@ -8,9 +8,11 @@ WORKDIR /app
 
 ENV GO111MODULE=on
 
-COPY ./ ./
+COPY ./go.mod ./go.mod
 
-RUN go mod tidy
+RUN go mod download
+
+COPY ./ ./
 
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a \
@@ -25,4 +27,4 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /app/user-client .
 
-CMD ["./user-client", "--name='Ewan Valentine'",  "--email='ewan.valentine89@gmail.com'", "--password='Testing123'", "--company='Peak.ai'"]
+CMD ["./user-client"]

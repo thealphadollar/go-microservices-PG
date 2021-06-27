@@ -2,64 +2,67 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
+	"os"
 
-	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
 	pb "github.com/thealphadollar/go-microservices-PG/user_service/proto/user"
 )
 
-func CreateUser(ctx context.Context, service micro.Service, user *pb.User) error {
-	client := pb.NewUserService("user.service", service.Client())
-	res, err := client.Create(ctx, user)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Response: ", res.User.Id, res.User.Company)
-	return nil
-}
+const (
+	name     = "Shivam"
+	email    = "s-kumar@mercari.com"
+	password = "somepass"
+	company  = "Mercari"
+)
 
 func main() {
 	service := micro.NewService(
-		micro.Flags(
-			&cli.StringFlag{
-				Name:  "name",
-				Usage: "your name",
-			},
-			&cli.StringFlag{
-				Name:  "email",
-				Usage: "your email",
-			},
-			&cli.StringFlag{
-				Name:  "company",
-				Usage: "your company",
-			},
-			&cli.StringFlag{
-				Name:  "password",
-				Usage: "your password",
-			},
-		),
+		micro.Name("user.cli"),
+		micro.Version("latest"),
 	)
-	service.Init(
-		micro.Action(func(c *cli.Context) error {
-			name := c.String("name")
-			email := c.String("email")
-			company := c.String("company")
-			password := c.String("password")
 
-			ctx := context.Background()
-			user := &pb.User{
-				Name:     name,
-				Email:    email,
-				Company:  company,
-				Password: password,
-			}
+	service.Init()
 
-			if err := CreateUser(ctx, service, user); err != nil {
-				fmt.Printf("failed to create user: %v", err)
-				return err
-			}
-			return nil
-		}),
-	)
+	client := pb.NewUserService("user.service", service.Client())
+	// r, err := client.Create(context.TODO(), &pb.User{
+	// 	Name:     name,
+	// 	Email:    email,
+	// 	Password: password,
+	// 	Company:  company,
+	// })
+	// if err != nil {
+	// 	log.Fatalf("Could not create: %v", err)
+	// }
+	// log.Printf("Created: %s", r.User.Id)
+
+	getAll, err := client.GetAll(context.Background(), &pb.Request{})
+	if err != nil {
+		log.Fatalf("Could not get all users: %v", err)
+	}
+
+	for _, v := range getAll.Users {
+		log.Println(v)
+	}
+
+	authResp, err := client.Auth(context.TODO(), &pb.User{
+		Email:    email,
+		Password: password,
+	})
+
+	if err != nil {
+		log.Fatalf("failed to login: %v", err)
+	}
+
+	log.Printf("Your access token: %s", authResp.Token)
+
+	_, err2 := client.ValidateToken(context.Background(), &pb.Token{
+		Token: authResp.Token,
+	})
+
+	if err2 != nil {
+		log.Fatalf("failed to validate, %v", err2)
+	}
+
+	os.Exit(0)
 }

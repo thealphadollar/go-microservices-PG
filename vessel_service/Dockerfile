@@ -9,10 +9,11 @@ WORKDIR /app
 
 ENV GO111MODULE=on
 
+COPY ./go.mod ./go.mod
+
+RUN go mod download
+
 COPY ./ ./
-
-RUN go mod tidy
-
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a \
     -installsuffix cgo -o vessel-service ./vessel_service
