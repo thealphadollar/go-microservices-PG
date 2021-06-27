@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/micro/go-micro/v2"
+	_ "github.com/micro/go-plugins/broker/nats/v2"
 	pb "github.com/thealphadollar/go-microservices-PG/user_service/proto/user"
 )
 
@@ -37,7 +38,9 @@ func main() {
 	)
 	service.Init()
 
-	if err := pb.RegisterUserServiceHandler(service.Server(), &handler{repo, tokenService}); err != nil {
+	pubsub := service.Server().Options().Broker
+
+	if err := pb.RegisterUserServiceHandler(service.Server(), &handler{repo, tokenService, pubsub}); err != nil {
 		log.Panic(err)
 	}
 

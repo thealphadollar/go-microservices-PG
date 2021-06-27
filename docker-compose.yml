@@ -71,6 +71,11 @@ services:
         depends_on: 
             - user
 
+    email_service:
+        build:
+            context: .
+            dockerfile: ./email_service/Dockerfile
+
     database:
         image: postgres:alpine
         environment: 

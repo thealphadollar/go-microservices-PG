@@ -11,7 +11,7 @@ import (
 
 const (
 	name     = "Shivam"
-	email    = "s-kumar@mercari.com"
+	email    = "s-kumar2@mercari.com"
 	password = "somepass"
 	company  = "Mercari"
 )
@@ -25,16 +25,16 @@ func main() {
 	service.Init()
 
 	client := pb.NewUserService("user.service", service.Client())
-	// r, err := client.Create(context.TODO(), &pb.User{
-	// 	Name:     name,
-	// 	Email:    email,
-	// 	Password: password,
-	// 	Company:  company,
-	// })
-	// if err != nil {
-	// 	log.Fatalf("Could not create: %v", err)
-	// }
-	// log.Printf("Created: %s", r.User.Id)
+	r, err := client.Create(context.TODO(), &pb.User{
+		Name:     name,
+		Email:    email,
+		Password: password,
+		Company:  company,
+	})
+	if err != nil {
+		log.Fatalf("Could not create: %v", err)
+	}
+	log.Printf("Created: %s", r.User.Id)
 
 	getAll, err := client.GetAll(context.Background(), &pb.Request{})
 	if err != nil {
