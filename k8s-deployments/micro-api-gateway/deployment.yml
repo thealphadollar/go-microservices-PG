@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: micro-gateway
+  template:
+    metadata:
+      labels:
+        app: micro-gateway
+    spec:
+      containers:
+      - name: micro-gateway
+        image: microhq/micro:kubernetes
+        args:
+          - "api"
+          - "--handler=rpc"
+          - "--namespace=shippy"
+        env:
+        - name: MICRO_API_ADDRESS
+          value: ":80"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+          name: micro-api-gateway-port
