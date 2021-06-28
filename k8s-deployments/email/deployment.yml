@@ -1,33 +1,31 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: vessel
+  name: email
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vessel
+      app: email
   template:
     metadata:
       labels:
-        app: vessel
+        app: email
     spec:
       containers:
-      - name: vessel-service
-        image: eu.gcr.io/blink/vessel-service:latest
+      - name: email-service
+      # below line should be docker image
+        image: eu.gcr.io/blink/email-service:latest
         imagePullPolicy: Always
         command: [
-          "./shippy-vessel-service",
+          "./shippy-email-service",
           "--selector=static",
           "--server_address=:8080",
         ]
-        env:
-          - name: DB_HOST
-            value: "mongo:27017"
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 8080
-          name: vessel-port
+          name: email-port

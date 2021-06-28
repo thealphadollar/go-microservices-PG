@@ -1,23 +1,24 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: vessel
+  name: consignment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vessel
+      app: consignment
   template:
     metadata:
       labels:
-        app: vessel
+        app: consignment
     spec:
       containers:
-      - name: vessel-service
-        image: eu.gcr.io/blink/vessel-service:latest
+      - name: consignment-service
+      # below line should be docker image
+        image: eu.gcr.io/blink/consignment-service:latest
         imagePullPolicy: Always
         command: [
-          "./shippy-vessel-service",
+          "./shippy-consignment-service",
           "--selector=static",
           "--server_address=:8080",
         ]
@@ -30,4 +31,4 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 8080
-          name: vessel-port
+          name: consignment-port

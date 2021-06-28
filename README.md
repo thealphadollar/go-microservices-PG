@@ -28,3 +28,7 @@ The dockerfile for client is present in the "client" folder in the project root.
 ## Credit
 
 The playground follows the [10-part tutorial on building microservices in Go](https://ewanvalentine.io/microservices-in-golang-part-1/) by @EwanValentine.
+
+## Disclaimer
+
+The parent developer of micro, @microhq , has been shut down. Due to the same, some features may not work as intended.

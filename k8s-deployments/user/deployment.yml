@@ -1,33 +1,40 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: vessel
+  name: user
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vessel
+      app: user
   template:
     metadata:
       labels:
-        app: vessel
+        app: user
     spec:
       containers:
-      - name: vessel-service
-        image: eu.gcr.io/blink/vessel-service:latest
+      - name: user-service
+      # below line should be docker image
+        image: eu.gcr.io/blink/user-service:latest
         imagePullPolicy: Always
         command: [
-          "./shippy-vessel-service",
+          "./shippy-user-service",
           "--selector=static",
           "--server_address=:8080",
         ]
         env:
           - name: DB_HOST
-            value: "mongo:27017"
+            value: "postgres:5432"
+          - name: DB_NAME
+            value: "postgres"
+          - name: DB_PASS
+            value: "postgres"
+          - name: DB_USER
+            value: "postgres"
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 8080
-          name: vessel-port
+          name: user-port

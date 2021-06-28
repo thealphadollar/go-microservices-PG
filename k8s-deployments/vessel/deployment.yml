@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: vessel-service
+      # below line should be docker image
         image: eu.gcr.io/blink/vessel-service:latest
         imagePullPolicy: Always
         command: [

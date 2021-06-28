@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/micro/go-micro/v2"
+	k8s "github.com/micro/kubernetes/go/micro"
 	pb "github.com/thealphadollar/go-microservices-PG/vessel_service/proto/vessel"
 )
 
@@ -15,7 +16,7 @@ const (
 
 func main() {
 
-	service := micro.NewService(
+	service := k8s.NewService(
 		micro.Name("vessel.service"),
 	)
 	service.Init()
